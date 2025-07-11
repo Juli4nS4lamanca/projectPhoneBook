@@ -23,8 +23,15 @@ const personSchema = new mongoose.Schema({
   },
   number: {
     type: String,
-    minLength: 10,
-    required: true
+    minLength: 8,
+    required: true,
+    validate: {
+      validator: number => {
+        const regexNumber = /^\d{2,3}-\d{6,}$/
+        return regexNumber.test(number)
+      },
+      message: props => `${props.value} isnt a valid number, formated ##-##### or ###-#######`
+    }
   },
 })
 

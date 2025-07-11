@@ -17,7 +17,6 @@ morgan.token('content', (req, res) => {
 
 app.use(morgan(':method :url :status :response-time ms :content'))
 
-
 //Endpoints
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
@@ -62,7 +61,11 @@ app.put('/api/persons/:id', (request, response, next) => {
     { name, number },
     { new: true, runValidators: true, context: 'query' })
     .then(updatePerson => {
-      response.json(updatePerson)
+      if (updatePerson) {
+        response.json(updatePerson)
+      } else {
+        response.status(404).end()
+      }
     })
     .catch(error => next(error))
 
@@ -88,12 +91,14 @@ app.post('/api/persons', (request, response, next) => {
 
 })
 
+//unknownEndpoint
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endopoint' })
 }
 
 app.use(unknownEndpoint)
 
+// error Middleware
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 

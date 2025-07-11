@@ -34,16 +34,22 @@ const Add = ({ persons, setPersons, setType, setMessage }) => {
             }, 5000)
           })
           .catch(error => {
-            console.error(error)
-            setMessage(`${person.name} was already removed from server`)
-            setType('error')
+            if (error.response?.status === 404) {
+              setMessage(`${person.name} has already been removed from the server`)
+              setType('error')
+              setPersons(persons.filter(p => p.id !== person.id))
+            } else {
+              const errorMessage = error.response?.data?.error
+                ? error.response.data.error
+                : 'An unexpected error'
+              setMessage(errorMessage)
+              setType('error')
+            }
             setTimeout(() => {
               setMessage(null)
               setType(null)
             }, 5000)
-            setPersons(persons.filter(p => p.id !== person.id))
           })
-        return
       }
       return
     }
@@ -56,6 +62,18 @@ const Add = ({ persons, setPersons, setType, setMessage }) => {
         setNewNumber('')
         setMessage(`Added ${personObject.name}`)
         setType('success')
+        setTimeout(() => {
+          setMessage(null)
+          setType(null)
+        }, 5000)
+      })
+      .catch(error => {
+        const errorMessage = error.response?.data?.error
+          ? error.response.data.error
+          : 'An unexpected error'
+        setMessage(errorMessage)
+        setType('error')
+        console.log(error.response.data.error)
         setTimeout(() => {
           setMessage(null)
           setType(null)
