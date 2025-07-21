@@ -1,5 +1,4 @@
 require('dotenv').config()
-let persons = require('./persons.js')
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
@@ -11,7 +10,7 @@ app.use(cors())
 app.use(express.static('dist'))
 
 //Definicion de Morga
-morgan.token('content', (req, res) => {
+morgan.token('content', (req) => {
   return JSON.stringify(req.body)
 })
 
@@ -24,7 +23,7 @@ app.get('/api/persons', (request, response) => {
   })
 })
 
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
   Person.countDocuments({})
     .then(nPersons => {
       const date = new Date()
@@ -49,6 +48,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
     .then(result => {
+      console.log(result)
       response.status(204).end()
     })
     .catch(error => next(error))
